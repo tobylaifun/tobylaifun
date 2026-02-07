@@ -506,12 +506,6 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     # Calculate total stars
     total_stars = sum(r.get('stargazers_count', 0) for r in own_repos)
     
-    for svg_file in glob.glob('star-history*.svg'):
-        try:
-            os.remove(svg_file)
-        except OSError as e:
-            print(f"Warning: Could not remove {svg_file}: {e}")
-    
     # Fetch star history from GitHub API (only if not mock mode)
     star_history = []
     repo_creations = {}
@@ -530,6 +524,19 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
         with open(star_chart_filename, 'w', encoding='utf-8') as f:
             f.write(star_chart_svg)
         print(f"Star trend chart saved to {star_chart_filename}")
+        
+        # Delete old star history SVG files, keep only the newest one
+        # Note: Files are sorted lexicographically by name. Since filenames use
+        # timestamp format YYYYMMDDHHMMSS, newer files sort last
+        all_star_svgs = sorted(glob.glob('star-history-*.svg'))
+        if len(all_star_svgs) > 1:
+            # Keep the newest (last in sorted list), delete others
+            for old_svg in all_star_svgs[:-1]:
+                try:
+                    os.remove(old_svg)
+                    print(f"Removed old star history file: {old_svg}")
+                except OSError as e:
+                    print(f"Warning: Could not remove {old_svg}: {e}")
     
     # Get user info
     name = user_data.get('name', username)
