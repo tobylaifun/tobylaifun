@@ -18,46 +18,22 @@
 
 ---
 
-focusing on interesting things
+💻 Full-stack developer passionate about open source and creative coding.
 
 I love [dao3.fun](https://dao3.fun), a platform for creating & playing maps!  
 也热爱 [dao3.fun 神奇代码岛](https://dao3.fun)，一个属于创作者和玩家的地图平台。
 
 ## 📈 GitHub Statistics / GitHub 统计
 
-- **Public Repositories / 公开仓库**: 19
-- **Total Stars / 总星标数**: ⭐ 41
-- **Followers / 关注者**: 59
+<div align="center">
 
----
+| 📊 统计项 | 📈 数值 |
+|:---:|:---:|
+| 🏆 **Total Stars / 总星标数** | **⭐ 0** |
+| 📦 **Public Repositories / 公开仓库** | **72** |
+| 👥 **Followers / 关注者** | **59** |
 
-## ✨ Featured Projects / 特色项目
-
-| Project | Description | Main Techs | Status |
-| ------- | ----------- | ---------- | ------ |
-| [Arenaless](https://github.com/Box3TRC/ArenaLess) | Dao3 Arena TypeScript programming with vscode.dev support<br>Dao3 Arena编辑器 TypeScript 编程，支持 vscode.dev | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Active |
-| [Box3Convert](https://github.com/Box3TRC/Box3Convert) | Tools for Dao3/Box3 format & resource conversion<br>Dao3/Box3 资源格式转换小工具(方块/模型/俯视图转化) | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) | Active |
-| [OnlineObj2Voxel](https://github.com/tobylai-toby/OnlineObj2Voxel) | Online OBJ-to-voxel converter for Dao3/Box3 (JS+WASM)<br>OBJ 模型在线转体素，支持 Dao3/Box3，JS+WASM | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) ![WebAssembly](https://img.shields.io/badge/WASM-blueviolet?logo=webassembly&logoColor=white) | Active |
-| [Areact](https://github.com/Box3TRC/Areact) | Arena + React: React framework UI for Dao3 (experimental)<br>Dao3 的 React 框架 UI（实验性，TypeScript） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Experimental |
-| [daopy-runtime](https://github.com/tobylai-toby/daopy-runtime) | Run Python on Dao3, API integration (TypeScript/Python)<br>Dao3 上运行 Python 的运行时（Arenaless包含此在线模板） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) ![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white) | Active |
-| [QMCLI](https://github.com/tobylai-toby/QMCLI) | Quick Minecraft Launcher CLI (archived)<br>快速 Minecraft 启动器 CLI（已归档） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Archived |
-
----
-
-## ⭐ 推荐项目 / Recommended Projects
-
-| Repository | Description | Stars | Language | Updated |
-| ---------- | ----------- | ----- | -------- | ------- |
-| [hexo-theme-mdsuper](https://github.com/tobylaifun/hexo-theme-mdsuper) | A hexo blog theme using mdui-v2 with Material You (Material Design 3). Supports ... | ⭐ 21 | CSS | 2026-02-05 |
-| [OnlineObj2Voxel](https://github.com/tobylaifun/OnlineObj2Voxel) | Online Obj2Voxel using WebAssembly+Eisenwave/obj2voxel and preact | ⭐ 3 | JavaScript | 2025-01-13 |
-| [daopy-runtime](https://github.com/tobylaifun/daopy-runtime) | 在岛三上运行Python，并支持访问API | ⭐ 5 | Python | 2026-01-14 |
-| [dao3up](https://github.com/tobylaifun/dao3up) | 适用于ArenaPro的构建/上传工具CLI，可以支持bun/esbuild/deno(emit) | ⭐ 2 | TypeScript | 2025-11-29 |
-| [QMCLI](https://github.com/tobylaifun/QMCLI) | A Quick Minecraft Launcher CLI (Work In Progress) 一个快速的Minecraft启动器CLI（开发中） | ⭐ 2 | TypeScript | 2025-02-22 |
-| [ap-more](https://github.com/tobylaifun/ap-more) | No description | ⭐ 1 | Python | 2024-08-12 |
-| [ArenaLess-Template](https://github.com/tobylaifun/ArenaLess-Template) | No description | ⭐ 1 | TypeScript | 2024-08-15 |
-| [cyberai20x5-logicrebel](https://github.com/tobylaifun/cyberai20x5-logicrebel) | 本项目是神奇代码岛神岛实验室举行的 VibeAI 2025 第一轮比赛的项目。 该比赛要求代码完全由AI编写。这是一个Blockly+Pixi.js的编程闯关游... | ⭐ 1 | HTML | 2025-08-08 |
-| [dao3charts](https://github.com/tobylaifun/dao3charts) | Draw charts like bar,line,pie on Arena(dao3.fun) | ⭐ 1 | TypeScript | 2025-07-08 |
-| [dao3up.nvim](https://github.com/tobylaifun/dao3up.nvim) | 适用于 dao3up 的 Neovim 插件  可以实现一些原本在 Vscode + ArenaPro Creator 上的编辑功能 | ⭐ 1 | Lua | 2025-08-29 |
+</div>
 
 ---
 
@@ -71,7 +47,7 @@ I love [dao3.fun](https://dao3.fun), a platform for creating & playing maps!
 ![React](https://img.shields.io/badge/React-61dafb?logo=react&logoColor=black)
 ![Vue.js](https://img.shields.io/badge/Vue.js-42b883?logo=vue.js&logoColor=white)
 
-喜欢 TypeScript、Node.js、Python，也关注新兴的 Deno/Bun。前端偏爱 React/Vue，业余也折腾 Minecraft、平台开发等。
+热爱 TypeScript、Node.js 和 Python 等技术栈，积极探索 Deno、Bun 等新兴运行时。前端方面偏好 React 和 Vue 框架，业余时间也喜欢研究 Minecraft 开发、游戏平台搭建等有趣的项目。
 
 ---
 
@@ -83,16 +59,23 @@ I love [dao3.fun](https://dao3.fun), a platform for creating & playing maps!
 
 ---
 
-## 📊 GitHub Stats
+## 📊 GitHub Stats & Analytics / GitHub 数据分析
 
-![Toby Lai's GitHub stats](https://github-readme-stats.vercel.app/api?username=tobylaifun&show_icons=true&theme=default)
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=tobylaifun&layout=compact&size_weight=0.5&count_weight=0.5&hide=java)
+<div align="center">
+
+### 📈 GitHub Contribution Graph / GitHub 贡献图
+![](https://ghchart.rshah.org/tobylaifun)
+
+### 📊 GitHub Profile Views / 访问统计
+![](https://komarev.com/ghpvc/?username=tobylaifun&color=brightgreen&style=flat-square&label=Profile+Views)
+
+</div>
 
 ---
 
-_Thanks for visiting! Feel free to explore my work or connect for collaboration._  
-_感谢访问，欢迎交流或一起折腾！_
+_Thanks for visiting! Feel free to explore my projects and reach out for collaboration or discussion._  
+_感谢访问！欢迎探索我的项目，也期待与你交流合作。_
 
 ---
 
-<sub>Last updated: 2026-02-07 05:24:58 UTC | Auto-generated by [generate_readme.py](generate_readme.py)</sub>
+<sub>Last updated: 2026-02-07 05:51:13 UTC | Auto-generated by [generate_readme.py](generate_readme.py)</sub>

@@ -12,6 +12,241 @@ import urllib.request
 import urllib.error
 
 
+def fetch_repo_stargazers_history(owner: str, repo: str, max_stars: int = 100) -> List[Dict]:
+    """Fetch stargazer timestamps for a repository using GitHub API
+    
+    Returns list of {'starred_at': 'timestamp'} for each star
+    Note: Limited to max_stars to avoid rate limiting
+    """
+    stargazers = []
+    page = 1
+    per_page = 100
+    
+    headers = {
+        'User-Agent': 'Mozilla/5.0',
+        'Accept': 'application/vnd.github.v3.star+json'  # Get star timestamps
+    }
+    
+    # Add token if available
+    github_token = os.environ.get('GITHUB_TOKEN')
+    if github_token:
+        headers['Authorization'] = f'token {github_token}'
+    
+    try:
+        while len(stargazers) < max_stars:
+            url = f"https://api.github.com/repos/{owner}/{repo}/stargazers?page={page}&per_page={per_page}"
+            req = urllib.request.Request(url, headers=headers)
+            
+            with urllib.request.urlopen(req, timeout=10) as response:
+                data = json.loads(response.read().decode())
+                if not data:
+                    break
+                
+                for item in data:
+                    if 'starred_at' in item:
+                        stargazers.append({
+                            'starred_at': item['starred_at'],
+                            'repo': repo
+                        })
+                
+                if len(data) < per_page:
+                    break
+                    
+                page += 1
+                
+                # Stop if we've collected enough
+                if len(stargazers) >= max_stars:
+                    break
+                    
+    except Exception as e:
+        print(f"Warning: Could not fetch stargazers for {owner}/{repo}: {e}")
+    
+    return stargazers
+
+
+def aggregate_star_history(username: str, repos: List[Dict], max_per_repo: int = 100) -> tuple:
+    """Aggregate star history from all repositories
+    
+    Returns tuple: (history_list, repo_creations)
+    - history_list: [{'date': 'YYYY-MM-DD', 'stars': count}] sorted by date
+    - repo_creations: {date: [repo_name1, repo_name2, ...]} repos created on that date
+    """
+    from collections import defaultdict
+    
+    all_stargazers = []
+    repo_creations = defaultdict(list)
+    
+    # Fetch stargazers for top repositories (by star count)
+    sorted_repos = sorted(repos, key=lambda x: x.get('stargazers_count', 0), reverse=True)
+    
+    print(f"Fetching star history for top repositories...")
+    for repo in sorted_repos[:10]:  # Limit to top 10 repos to avoid rate limiting
+        repo_name = repo['name']
+        star_count = repo.get('stargazers_count', 0)
+        created_at = repo.get('created_at', '')[:10]  # Extract YYYY-MM-DD
+        
+        # Track repo creation date
+        if created_at:
+            repo_creations[created_at].append(repo_name)
+        
+        if star_count == 0:
+            continue
+            
+        print(f"  Fetching {repo_name} ({star_count} stars, created {created_at})...")
+        stargazers = fetch_repo_stargazers_history(username, repo_name, max_per_repo)
+        all_stargazers.extend(stargazers)
+    
+    if not all_stargazers:
+        print("No star history data available")
+        return [], {}
+    
+    # Aggregate by date
+    daily_stars = defaultdict(int)
+    for star in all_stargazers:
+        date = star['starred_at'][:10]  # Extract YYYY-MM-DD
+        daily_stars[date] += 1
+    
+    # Convert to cumulative sum
+    sorted_dates = sorted(daily_stars.keys())
+    cumulative = []
+    total = 0
+    
+    for date in sorted_dates:
+        total += daily_stars[date]
+        cumulative.append({
+            'date': date,
+            'stars': total
+        })
+    
+    print(f"Generated star history: {len(cumulative)} data points")
+    print(f"Repository creations tracked: {len(repo_creations)} dates")
+    return cumulative, dict(repo_creations)
+
+
+def generate_star_trend_svg(history: List[Dict], repo_creations: Dict[str, List[str]], username: str) -> str:
+    """Generate SVG chart showing star growth with repo creation markers"""
+    if len(history) < 2:
+        return ""
+    
+    # SVG dimensions
+    width = 900
+    height = 400
+    padding_left = 60
+    padding_right = 40
+    padding_top = 60
+    padding_bottom = 80
+    chart_width = width - padding_left - padding_right
+    chart_height = height - padding_top - padding_bottom
+    
+    # Get data
+    dates = [entry['date'] for entry in history]
+    stars = [entry['stars'] for entry in history]
+    
+    max_stars = max(stars)
+    min_stars = 0
+    star_range = max_stars if max_stars > 0 else 1
+    
+    # Helper function to convert data to coordinates
+    def get_x(index):
+        return padding_left + (index / (len(dates) - 1)) * chart_width
+    
+    def get_y(star_count):
+        return padding_top + chart_height - ((star_count - min_stars) / star_range) * chart_height
+    
+    # Generate path for the star trend line
+    points = []
+    for i, star_count in enumerate(stars):
+        x = get_x(i)
+        y = get_y(star_count)
+        points.append(f"{x},{y}")
+    
+    path_data = "M " + " L ".join(points)
+    
+    # Create SVG
+    svg = f'''<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="{width}" height="{height}" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="{width//2}" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#333">
+    ⭐ Total Stars Growth Trend / 总星标增长趋势
+  </text>
+  
+  <!-- Y-axis labels -->
+  <text x="{padding_left - 10}" y="{padding_top}" text-anchor="end" font-size="12" fill="#666">{max_stars}</text>
+  <text x="{padding_left - 10}" y="{padding_top + chart_height}" text-anchor="end" font-size="12" fill="#666">{min_stars}</text>
+  <text x="{padding_left - 10}" y="{padding_top + chart_height//2}" text-anchor="end" font-size="12" fill="#666">{max_stars//2}</text>
+  
+  <!-- Grid lines -->
+  <line x1="{padding_left}" y1="{padding_top}" x2="{padding_left + chart_width}" y2="{padding_top}" stroke="#e0e0e0" stroke-width="1"/>
+  <line x1="{padding_left}" y1="{padding_top + chart_height//2}" x2="{padding_left + chart_width}" y2="{padding_top + chart_height//2}" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="{padding_left}" y1="{padding_top + chart_height}" x2="{padding_left + chart_width}" y2="{padding_top + chart_height}" stroke="#666" stroke-width="2"/>
+  
+  <!-- Axes -->
+  <line x1="{padding_left}" y1="{padding_top}" x2="{padding_left}" y2="{padding_top + chart_height}" stroke="#666" stroke-width="2"/>
+  
+  <!-- X-axis labels -->
+  <text x="{padding_left}" y="{height - padding_bottom + 20}" text-anchor="start" font-size="11" fill="#999">{dates[0]}</text>
+  <text x="{padding_left + chart_width}" y="{height - padding_bottom + 20}" text-anchor="end" font-size="11" fill="#999">{dates[-1]}</text>
+  
+  <!-- Star trend line -->
+  <path d="{path_data}" stroke="#4CAF50" stroke-width="3" fill="none"/>
+  
+  <!-- Regular data points -->
+  <g>
+'''
+    
+    # Add data points
+    for i, (date, star_count) in enumerate(zip(dates, stars)):
+        x = get_x(i)
+        y = get_y(star_count)
+        
+        # Check if this date has repo creations
+        if date in repo_creations:
+            # Special marker for repo creation dates
+            repos = repo_creations[date]
+            repo_names = ', '.join(repos[:3])  # Show first 3 repo names
+            if len(repos) > 3:
+                repo_names += f' +{len(repos)-3} more'
+            
+            # Determine label position (avoid overlapping with chart edges)
+            label_x = x + 12 if x < width - 150 else x - 12
+            text_anchor = "start" if x < width - 150 else "end"
+            
+            svg += f'''    <!-- Repo creation marker at {date} -->
+    <circle cx="{x}" cy="{y}" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>{date}: Created {repo_names}</title>
+    <text x="{label_x}" y="{y - 10}" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="{text_anchor}">📦 {repos[0]}</text>
+    <text x="{label_x}" y="{y + 3}" font-size="9" fill="#999" text-anchor="{text_anchor}">{date}</text>
+'''
+        else:
+            # Regular point (only show every Nth point to avoid clutter)
+            if i % max(1, len(dates) // 20) == 0 or i == len(dates) - 1:
+                svg += f'''    <circle cx="{x}" cy="{y}" r="3" fill="#4CAF50"/>
+'''
+    
+    svg += '''  </g>
+  
+  <!-- Legend -->
+  <g>
+    <circle cx="''' + str(width - 200) + '''" cy="''' + str(height - 40) + '''" r="3" fill="#4CAF50"/>
+    <text x="''' + str(width - 190) + '''" y="''' + str(height - 36) + '''" font-size="12" fill="#666">Star count</text>
+    
+    <circle cx="''' + str(width - 200) + '''" cy="''' + str(height - 20) + '''" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <text x="''' + str(width - 190) + '''" y="''' + str(height - 16) + '''" font-size="12" fill="#666">Repo created</text>
+  </g>
+  
+  <!-- Stats -->
+  <text x="20" y="''' + str(height - 40) + '''" font-size="11" fill="#666">Total: ''' + str(max_stars) + ''' ⭐</text>
+  <text x="20" y="''' + str(height - 25) + '''" font-size="11" fill="#666">Repos created: ''' + str(len(repo_creations)) + '''</text>
+  <text x="20" y="''' + str(height - 10) + '''" font-size="11" fill="#999">Generated: ''' + datetime.now().strftime('%Y-%m-%d') + '''</text>
+</svg>'''
+    
+    return svg
+
+
+
+
 def fetch_github_data(username: str) -> Dict:
     """Fetch user data from GitHub API"""
     url = f"https://api.github.com/users/{username}"
@@ -210,6 +445,23 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     # Calculate total stars
     total_stars = sum(r.get('stargazers_count', 0) for r in own_repos)
     
+    # Fetch star history from GitHub API (only if not mock mode)
+    star_history = []
+    repo_creations = {}
+    if not use_mock and total_stars > 0:
+        print(f"\nFetching star history from GitHub API...")
+        star_history, repo_creations = aggregate_star_history(username, own_repos)
+    
+    # Generate SVG chart if we have history data
+    star_chart_svg = ""
+    if star_history and len(star_history) >= 2:
+        star_chart_svg = generate_star_trend_svg(star_history, repo_creations, username)
+        # Save SVG to file
+        svg_filename = 'star-history.svg'
+        with open(svg_filename, 'w', encoding='utf-8') as f:
+            f.write(star_chart_svg)
+        print(f"Star trend chart saved to {svg_filename}")
+    
     # Get user info
     name = user_data.get('name', username)
     bio = user_data.get('bio', '')
@@ -261,7 +513,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 
 """
     else:
-        readme += """focusing on interesting things
+        readme += """💻 Full-stack developer passionate about open source and creative coding.
 
 """
     
@@ -275,32 +527,21 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     # Add statistics section
     readme += f"""## 📈 GitHub Statistics / GitHub 统计
 
-- **Public Repositories / 公开仓库**: {public_repos}
-- **Total Stars / 总星标数**: ⭐ {total_stars}
-- **Followers / 关注者**: {followers}
+<div align="center">
+
+| 📊 统计项 | 📈 数值 |
+|:---:|:---:|
+| 🏆 **Total Stars / 总星标数** | **⭐ {total_stars}** |
+| 📦 **Public Repositories / 公开仓库** | **{public_repos}** |
+| 👥 **Followers / 关注者** | **{followers}** |
+
+</div>
 
 ---
 
 """
     
-    # Add featured projects section FIRST (keeping the original if tobylai-toby or tobylaifun)
-    if username in ["tobylai-toby", "tobylaifun"]:
-        readme += """## ✨ Featured Projects / 特色项目
-
-| Project | Description | Main Techs | Status |
-| ------- | ----------- | ---------- | ------ |
-| [Arenaless](https://github.com/Box3TRC/ArenaLess) | Dao3 Arena TypeScript programming with vscode.dev support<br>Dao3 Arena编辑器 TypeScript 编程，支持 vscode.dev | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Active |
-| [Box3Convert](https://github.com/Box3TRC/Box3Convert) | Tools for Dao3/Box3 format & resource conversion<br>Dao3/Box3 资源格式转换小工具(方块/模型/俯视图转化) | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) | Active |
-| [OnlineObj2Voxel](https://github.com/tobylai-toby/OnlineObj2Voxel) | Online OBJ-to-voxel converter for Dao3/Box3 (JS+WASM)<br>OBJ 模型在线转体素，支持 Dao3/Box3，JS+WASM | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) ![WebAssembly](https://img.shields.io/badge/WASM-blueviolet?logo=webassembly&logoColor=white) | Active |
-| [Areact](https://github.com/Box3TRC/Areact) | Arena + React: React framework UI for Dao3 (experimental)<br>Dao3 的 React 框架 UI（实验性，TypeScript） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Experimental |
-| [daopy-runtime](https://github.com/tobylai-toby/daopy-runtime) | Run Python on Dao3, API integration (TypeScript/Python)<br>Dao3 上运行 Python 的运行时（Arenaless包含此在线模板） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) ![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white) | Active |
-| [QMCLI](https://github.com/tobylai-toby/QMCLI) | Quick Minecraft Launcher CLI (archived)<br>快速 Minecraft 启动器 CLI（已归档） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Archived |
-
----
-
-"""
-    
-    # Add top repositories section AFTER featured projects
+    # Add top repositories section
     if top_repos:
         readme += """## ⭐ 推荐项目 / Recommended Projects
 
@@ -337,7 +578,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     readme += """![React](https://img.shields.io/badge/React-61dafb?logo=react&logoColor=black)
 ![Vue.js](https://img.shields.io/badge/Vue.js-42b883?logo=vue.js&logoColor=white)
 
-喜欢 TypeScript、Node.js、Python，也关注新兴的 Deno/Bun。前端偏爱 React/Vue，业余也折腾 Minecraft、平台开发等。
+热爱 TypeScript、Node.js 和 Python 等技术栈，积极探索 Deno、Bun 等新兴运行时。前端方面偏好 React 和 Vue 框架，业余时间也喜欢研究 Minecraft 开发、游戏平台搭建等有趣的项目。
 
 ---
 
@@ -363,15 +604,46 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 """
     
     # Add GitHub stats
-    readme += f"""## 📊 GitHub Stats
+    readme += f"""## 📊 GitHub Stats & Analytics / GitHub 数据分析
 
-![{name}'s GitHub stats](https://github-readme-stats.vercel.app/api?username={username}&show_icons=true&theme=default)
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username={username}&layout=compact&size_weight=0.5&count_weight=0.5&hide=java)
+<div align="center">
+
+### 📈 GitHub Contribution Graph / GitHub 贡献图
+![](https://ghchart.rshah.org/{username})
+
+"""
+    
+    # Add star history chart if data available
+    if star_history and len(star_history) >= 2:
+        # Display the SVG chart
+        first_star = star_history[0]
+        last_star = star_history[-1]
+        days_span = len(star_history)
+        num_repos_created = len(repo_creations)
+        
+        readme += f"""### ⭐ Total Stars Growth Trend / 总星标增长趋势
+
+![Star History Chart](star-history.svg)
+
+**Summary / 摘要:**
+- 📅 From {first_star['date']} to {last_star['date']} ({days_span} days)
+- 📈 Growth: {first_star['stars']} → {last_star['stars']} stars (+{last_star['stars'] - first_star['stars']})
+- 💫 Average: ~{(last_star['stars'] - first_star['stars']) / days_span:.2f} stars/day
+- 🎯 Repositories created during this period: {num_repos_created}
+
+*Chart shows cumulative stars over time. 🔴 Red dots mark repository creation dates.*
+
+"""
+    
+    readme += f"""### 📊 GitHub Profile Views / 访问统计
+![](https://komarev.com/ghpvc/?username={username}&color=brightgreen&style=flat-square&label=Profile+Views)
+
+</div>
 
 ---
 
-_Thanks for visiting! Feel free to explore my work or connect for collaboration._  
-_感谢访问，欢迎交流或一起折腾！_
+_Thanks for visiting! Feel free to explore my projects and reach out for collaboration or discussion._  
+_感谢访问！欢迎探索我的项目，也期待与你交流合作。_
 
 ---
 
