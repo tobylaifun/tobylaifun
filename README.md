@@ -26,8 +26,21 @@ I love [dao3.fun](https://dao3.fun), a platform for creating & playing maps!
 ## 📈 GitHub Statistics / GitHub 统计
 
 - **Public Repositories / 公开仓库**: 72
-- **Total Stars / 总星标数**: ⭐ 45
+- **Total Stars / 总星标数**: ⭐ 39
 - **Followers / 关注者**: 59
+
+---
+
+## ✨ Featured Projects / 特色项目
+
+| Project | Description | Main Techs | Status |
+| ------- | ----------- | ---------- | ------ |
+| [Arenaless](https://github.com/Box3TRC/ArenaLess) | Dao3 Arena TypeScript programming with vscode.dev support<br>Dao3 Arena编辑器 TypeScript 编程，支持 vscode.dev | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Active |
+| [Box3Convert](https://github.com/Box3TRC/Box3Convert) | Tools for Dao3/Box3 format & resource conversion<br>Dao3/Box3 资源格式转换小工具(方块/模型/俯视图转化) | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) | Active |
+| [OnlineObj2Voxel](https://github.com/tobylai-toby/OnlineObj2Voxel) | Online OBJ-to-voxel converter for Dao3/Box3 (JS+WASM)<br>OBJ 模型在线转体素，支持 Dao3/Box3，JS+WASM | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) ![WebAssembly](https://img.shields.io/badge/WASM-blueviolet?logo=webassembly&logoColor=white) | Active |
+| [Areact](https://github.com/Box3TRC/Areact) | Arena + React: React framework UI for Dao3 (experimental)<br>Dao3 的 React 框架 UI（实验性，TypeScript） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Experimental |
+| [daopy-runtime](https://github.com/tobylai-toby/daopy-runtime) | Run Python on Dao3, API integration (TypeScript/Python)<br>Dao3 上运行 Python 的运行时（Arenaless包含此在线模板） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) ![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white) | Active |
+| [QMCLI](https://github.com/tobylai-toby/QMCLI) | Quick Minecraft Launcher CLI (archived)<br>快速 Minecraft 启动器 CLI（已归档） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Archived |
 
 ---
 
@@ -45,19 +58,6 @@ I love [dao3.fun](https://dao3.fun), a platform for creating & playing maps!
 | [ArenaLess-Template](https://github.com/tobylaifun/ArenaLess-Template) | No description | ⭐ 1 | TypeScript | 2024-08-15 |
 | [codemaologin](https://github.com/tobylaifun/codemaologin) | No description | ⭐ 1 | HTML | 2022-04-17 |
 | [cyberai20x5-logicrebel](https://github.com/tobylaifun/cyberai20x5-logicrebel) | 本项目是神奇代码岛神岛实验室举行的 VibeAI 2025 第一轮比赛的项目。 该比赛要求代码完全由AI编写。这是一个Blockly+Pixi.js的编程闯关游... | ⭐ 1 | HTML | 2025-08-08 |
-
----
-
-## ✨ Featured Projects / 特色项目
-
-| Project | Description | Main Techs | Status |
-| ------- | ----------- | ---------- | ------ |
-| [Arenaless](https://github.com/Box3TRC/ArenaLess) | Dao3 Arena TypeScript programming with vscode.dev support<br>Dao3 Arena编辑器 TypeScript 编程，支持 vscode.dev | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Active |
-| [Box3Convert](https://github.com/Box3TRC/Box3Convert) | Tools for Dao3/Box3 format & resource conversion<br>Dao3/Box3 资源格式转换小工具(方块/模型/俯视图转化) | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) | Active |
-| [OnlineObj2Voxel](https://github.com/tobylai-toby/OnlineObj2Voxel) | Online OBJ-to-voxel converter for Dao3/Box3 (JS+WASM)<br>OBJ 模型在线转体素，支持 Dao3/Box3，JS+WASM | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) ![WebAssembly](https://img.shields.io/badge/WASM-blueviolet?logo=webassembly&logoColor=white) | Active |
-| [Areact](https://github.com/Box3TRC/Areact) | Arena + React: React framework UI for Dao3 (experimental)<br>Dao3 的 React 框架 UI（实验性，TypeScript） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Experimental |
-| [daopy-runtime](https://github.com/tobylai-toby/daopy-runtime) | Run Python on Dao3, API integration (TypeScript/Python)<br>Dao3 上运行 Python 的运行时（Arenaless包含此在线模板） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) ![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white) | Active |
-| [QMCLI](https://github.com/tobylai-toby/QMCLI) | Quick Minecraft Launcher CLI (archived)<br>快速 Minecraft 启动器 CLI（已归档） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Archived |
 
 ---
 
@@ -95,4 +95,4 @@ _感谢访问，欢迎交流或一起折腾！_
 
 ---
 
-<sub>Last updated: 2026-02-07 03:58:28 UTC | Auto-generated by [generate_readme.py](generate_readme.py)</sub>
+<sub>Last updated: 2026-02-07 04:32:28 UTC | Auto-generated by [generate_readme.py](generate_readme.py)</sub>
