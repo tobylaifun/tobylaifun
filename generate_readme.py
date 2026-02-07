@@ -44,6 +44,51 @@ def fetch_github_data(username: str) -> Dict:
         }
 
 
+def fetch_pinned_repos(username: str) -> List[str]:
+    """Fetch pinned repositories for a user using GraphQL API"""
+    pinned_repos = []
+    
+    query = """
+    {
+      user(login: "%s") {
+        pinnedItems(first: 6, types: REPOSITORY) {
+          nodes {
+            ... on Repository {
+              name
+            }
+          }
+        }
+      }
+    }
+    """ % username
+    
+    url = 'https://api.github.com/graphql'
+    headers = {
+        'User-Agent': 'Mozilla/5.0',
+        'Content-Type': 'application/json',
+    }
+    
+    # Add token if available
+    github_token = os.environ.get('GITHUB_TOKEN')
+    if github_token:
+        headers['Authorization'] = f'Bearer {github_token}'
+    
+    try:
+        data = json.dumps({'query': query}).encode()
+        req = urllib.request.Request(url, data=data, headers=headers)
+        with urllib.request.urlopen(req) as response:
+            result = json.loads(response.read().decode())
+            if 'data' in result and result['data'] and 'user' in result['data']:
+                nodes = result['data']['user']['pinnedItems']['nodes']
+                pinned_repos = [node['name'] for node in nodes]
+                print(f"Found {len(pinned_repos)} pinned repositories")
+    except Exception as e:
+        print(f"Warning: Could not fetch pinned repos: {e}")
+        print("Continuing without pinned repos information")
+    
+    return pinned_repos
+
+
 def fetch_user_repos(username: str) -> List[Dict]:
     """Fetch all repositories for a user"""
     repos = []
@@ -126,13 +171,36 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     else:
         user_data = fetch_github_data(username)
         repos = fetch_user_repos(username)
+        pinned_repo_names = fetch_pinned_repos(username)
     
-    # Filter out forks and sort by stars
+    # Filter out forks
     own_repos = [r for r in repos if not r.get('fork', False)]
-    sorted_repos = sorted(own_repos, key=lambda x: x.get('stargazers_count', 0), reverse=True)
     
-    # Get top repos with stars
-    top_repos = [r for r in sorted_repos if r.get('stargazers_count', 0) > 0][:10]
+    # Calculate ranking score: pinned repos get +6 stars for sorting
+    # but we keep the original star count for display
+    if not use_mock:
+        pinned_set = set(pinned_repo_names)
+        for repo in own_repos:
+            repo_name = repo.get('name', '')
+            actual_stars = repo.get('stargazers_count', 0)
+            # Add ranking_score for sorting (pinned repos get +6 bonus)
+            if repo_name in pinned_set:
+                repo['ranking_score'] = actual_stars + 6
+                repo['is_pinned'] = True
+            else:
+                repo['ranking_score'] = actual_stars
+                repo['is_pinned'] = False
+    else:
+        # For mock mode, no pinned repos
+        for repo in own_repos:
+            repo['ranking_score'] = repo.get('stargazers_count', 0)
+            repo['is_pinned'] = False
+    
+    # Sort by ranking_score (which includes pin bonus), not just stars
+    sorted_repos = sorted(own_repos, key=lambda x: x.get('ranking_score', 0), reverse=True)
+    
+    # Get top repos with stars or pinned
+    top_repos = [r for r in sorted_repos if r.get('stargazers_count', 0) > 0 or r.get('is_pinned', False)][:10]
     
     # Calculate total stars
     total_stars = sum(r.get('stargazers_count', 0) for r in own_repos)
@@ -229,7 +297,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     
     # Add top repositories section AFTER featured projects
     if top_repos:
-        readme += """## ⭐ Top Repositories by Stars / 星标排名项目
+        readme += """## ⭐ 推荐项目 / Recommended Projects
 
 | Repository | Description | Stars | Language | Updated |
 | ---------- | ----------- | ----- | -------- | ------- |
