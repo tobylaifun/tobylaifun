@@ -275,9 +275,15 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     # Add statistics section
     readme += f"""## 📈 GitHub Statistics / GitHub 统计
 
-- **Public Repositories / 公开仓库**: {public_repos}
-- **Total Stars / 总星标数**: ⭐ {total_stars}
-- **Followers / 关注者**: {followers}
+<div align="center">
+
+| 📊 统计项 | 📈 数值 |
+|:---:|:---:|
+| 🏆 **Total Stars / 总星标数** | **⭐ {total_stars}** |
+| 📦 **Public Repositories / 公开仓库** | **{public_repos}** |
+| 👥 **Followers / 关注者** | **{followers}** |
+
+</div>
 
 ---
 
@@ -352,9 +358,6 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 
 ### 📈 GitHub Contribution Graph / GitHub 贡献图
 ![](https://ghchart.rshah.org/{username})
-
-### ⭐ Star History / 星标增长趋势
-[![Star History Chart](https://api.star-history.com/svg?repos={username}/hexo-theme-mdsuper,{username}/OnlineObj2Voxel,{username}/daopy-runtime,{username}/dao3up&type=Date)](https://star-history.com/#{username}/hexo-theme-mdsuper&{username}/OnlineObj2Voxel&{username}/daopy-runtime&{username}/dao3up&Date)
 
 ### 📊 GitHub Profile Views / 访问统计
 ![](https://komarev.com/ghpvc/?username={username}&color=brightgreen&style=flat-square&label=Profile+Views)
