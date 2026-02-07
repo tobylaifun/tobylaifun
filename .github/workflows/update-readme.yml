@@ -33,7 +33,8 @@ jobs:
       - name: Check for changes
         id: verify_diff
         run: |
-          git add -A
+          git add README.md
+          git add -A star-history-*.svg
           git diff --quiet --cached || echo "changed=true" >> $GITHUB_OUTPUT
       
       - name: Commit and push if changed
