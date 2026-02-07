@@ -209,9 +209,15 @@ def generate_star_trend_svg(history: List[Dict], repo_creations: Dict[str, List[
             if len(repos) > 3:
                 repo_names += f' +{len(repos)-3} more'
             
+            # Determine label position (avoid overlapping with chart edges)
+            label_x = x + 12 if x < width - 150 else x - 12
+            text_anchor = "start" if x < width - 150 else "end"
+            
             svg += f'''    <!-- Repo creation marker at {date} -->
     <circle cx="{x}" cy="{y}" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
     <title>{date}: Created {repo_names}</title>
+    <text x="{label_x}" y="{y - 10}" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="{text_anchor}">📦 {repos[0]}</text>
+    <text x="{label_x}" y="{y + 3}" font-size="9" fill="#999" text-anchor="{text_anchor}">{date}</text>
 '''
         else:
             # Regular point (only show every Nth point to avoid clutter)
