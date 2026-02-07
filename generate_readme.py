@@ -353,9 +353,6 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 ### 📈 GitHub Contribution Graph / GitHub 贡献图
 ![](https://ghchart.rshah.org/{username})
 
-### 🔥 GitHub Streak Stats / 连续贡献统计
-[![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user={username}&theme=default)](https://git.io/streak-stats)
-
 ### ⭐ Star History / 星标增长趋势
 [![Star History Chart](https://api.star-history.com/svg?repos={username}/hexo-theme-mdsuper,{username}/OnlineObj2Voxel,{username}/daopy-runtime,{username}/dao3up&type=Date)](https://star-history.com/#{username}/hexo-theme-mdsuper&{username}/OnlineObj2Voxel&{username}/daopy-runtime&{username}/dao3up&Date)
 
