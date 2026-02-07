@@ -350,12 +350,8 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 
 <div align="center">
 
-### 🏆 GitHub Profile Trophy / GitHub 成就
-[![trophy](https://github-profile-trophy.vercel.app/?username={username}&theme=flat&no-frame=true&no-bg=true&margin-w=4&column=7)](https://github.com/ryo-ma/github-profile-trophy)
-
-### 📈 GitHub Statistics / GitHub 统计数据
-![{name}'s GitHub stats](https://github-readme-stats.vercel.app/api?username={username}&show_icons=true&theme=default)
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username={username}&layout=compact&size_weight=0.5&count_weight=0.5&hide=java)
+### 📈 GitHub Contribution Graph / GitHub 贡献图
+![](https://ghchart.rshah.org/{username})
 
 ### 🔥 GitHub Streak Stats / 连续贡献统计
 [![GitHub Streak](https://github-readme-streak-stats.herokuapp.com/?user={username}&theme=default)](https://git.io/streak-stats)
@@ -363,8 +359,8 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 ### ⭐ Star History / 星标增长趋势
 [![Star History Chart](https://api.star-history.com/svg?repos={username}/hexo-theme-mdsuper,{username}/OnlineObj2Voxel,{username}/daopy-runtime,{username}/dao3up&type=Date)](https://star-history.com/#{username}/hexo-theme-mdsuper&{username}/OnlineObj2Voxel&{username}/daopy-runtime&{username}/dao3up&Date)
 
-### 📊 GitHub Activity Graph / GitHub 活动图
-[![{name}'s github activity graph](https://github-readme-activity-graph.vercel.app/graph?username={username}&theme=github-compact)](https://github.com/ashutosh00710/github-readme-activity-graph)
+### 📊 GitHub Profile Views / 访问统计
+![](https://komarev.com/ghpvc/?username={username}&color=brightgreen&style=flat-square&label=Profile+Views)
 
 </div>
 
