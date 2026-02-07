@@ -3,6 +3,7 @@
 Generate GitHub Profile README based on username and star rankings
 """
 
+import glob
 import json
 import os
 import sys
@@ -76,11 +77,11 @@ def aggregate_star_history(username: str, repos: List[Dict], max_per_repo: int =
     all_stargazers = []
     repo_creations = defaultdict(list)
     
-    # Fetch stargazers for top repositories (by star count)
+    # Fetch stargazers for repositories (by star count)
     sorted_repos = sorted(repos, key=lambda x: x.get('stargazers_count', 0), reverse=True)
     
-    print(f"Fetching star history for top repositories...")
-    for repo in sorted_repos[:10]:  # Limit to top 10 repos to avoid rate limiting
+    print(f"Fetching star history for repositories...")
+    for repo in sorted_repos:
         repo_name = repo['name']
         star_count = repo.get('stargazers_count', 0)
         created_at = repo.get('created_at', '')[:10]  # Extract YYYY-MM-DD
@@ -95,16 +96,29 @@ def aggregate_star_history(username: str, repos: List[Dict], max_per_repo: int =
         print(f"  Fetching {repo_name} ({star_count} stars, created {created_at})...")
         stargazers = fetch_repo_stargazers_history(username, repo_name, max_per_repo)
         all_stargazers.extend(stargazers)
+        
+        missing_stars = star_count - len(stargazers)
+        if missing_stars > 0:
+            fallback_date = created_at or repo.get('updated_at', '')[:10] or datetime.now().strftime('%Y-%m-%d')
+            for _ in range(missing_stars):
+                all_stargazers.append({
+                    'starred_at': f"{fallback_date}T00:00:00Z",
+                    'repo': repo_name
+                })
     
     if not all_stargazers:
         print("No star history data available")
-        return [], {}
+        return [], dict(repo_creations)
     
     # Aggregate by date
     daily_stars = defaultdict(int)
     for star in all_stargazers:
         date = star['starred_at'][:10]  # Extract YYYY-MM-DD
         daily_stars[date] += 1
+    
+    for created_date in repo_creations.keys():
+        if created_date not in daily_stars:
+            daily_stars[created_date] = 0
     
     # Convert to cumulative sum
     sorted_dates = sorted(daily_stars.keys())
@@ -145,6 +159,7 @@ def generate_star_trend_svg(history: List[Dict], repo_creations: Dict[str, List[
     max_stars = max(stars)
     min_stars = 0
     star_range = max_stars if max_stars > 0 else 1
+    total_repos_created = sum(len(repos) for repos in repo_creations.values())
     
     # Helper function to convert data to coordinates
     def get_x(index):
@@ -196,6 +211,17 @@ def generate_star_trend_svg(history: List[Dict], repo_creations: Dict[str, List[
   <g>
 '''
     
+    label_boxes = []
+    label_line_height = 12
+    label_padding = 4
+    max_label_width = 220
+    min_label_width = 80
+    label_position_offsets = (0, 1, 2, 3, -1, -2, -3)
+
+    def boxes_overlap(box_a, box_b):
+        """Return True when label boxes (x_min, x_max, y_min, y_max) overlap."""
+        return not (box_a[1] < box_b[0] or box_a[0] > box_b[1] or box_a[3] < box_b[2] or box_a[2] > box_b[3])
+
     # Add data points
     for i, (date, star_count) in enumerate(zip(dates, stars)):
         x = get_x(i)
@@ -205,19 +231,49 @@ def generate_star_trend_svg(history: List[Dict], repo_creations: Dict[str, List[
         if date in repo_creations:
             # Special marker for repo creation dates
             repos = repo_creations[date]
-            repo_names = ', '.join(repos[:3])  # Show first 3 repo names
-            if len(repos) > 3:
-                repo_names += f' +{len(repos)-3} more'
+            repo_lines = [f"📦 {repo}" for repo in repos]
+            label_lines = repo_lines + [date]
+            label_height = label_line_height * len(label_lines)
+            max_line_length = max(len(line) for line in label_lines)
+            label_width = min(max_label_width, max(min_label_width, max_line_length * 6))
             
-            # Determine label position (avoid overlapping with chart edges)
-            label_x = x + 12 if x < width - 150 else x - 12
-            text_anchor = "start" if x < width - 150 else "end"
+            place_right = x < width - (label_width + padding_right)
+            label_x = x + 12 if place_right else x - 12
+            text_anchor = "start" if place_right else "end"
+            x_min = label_x if place_right else label_x - label_width
+            x_max = label_x + label_width if place_right else label_x
             
+            base_top = y - (label_height / 2)
+            min_top = padding_top + label_padding
+            max_top = padding_top + chart_height - label_height - label_padding
+            base_top = max(min_top, min(base_top, max_top))
+            
+            step = label_line_height + label_padding
+            candidate_offsets = label_position_offsets
+            label_top = base_top
+            label_box = (x_min, x_max, base_top - label_padding, base_top + label_height + label_padding)
+            for offset in candidate_offsets:
+                candidate_top = base_top + (offset * step)
+                candidate_top = max(min_top, min(candidate_top, max_top))
+                candidate_box = (x_min, x_max, candidate_top - label_padding, candidate_top + label_height + label_padding)
+                if not any(boxes_overlap(candidate_box, existing) for existing in label_boxes):
+                    label_top = candidate_top
+                    label_box = candidate_box
+                    break
+            
+            label_boxes.append(label_box)
+            repo_names = ', '.join(repos)
             svg += f'''    <!-- Repo creation marker at {date} -->
     <circle cx="{x}" cy="{y}" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
     <title>{date}: Created {repo_names}</title>
-    <text x="{label_x}" y="{y - 10}" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="{text_anchor}">📦 {repos[0]}</text>
-    <text x="{label_x}" y="{y + 3}" font-size="9" fill="#999" text-anchor="{text_anchor}">{date}</text>
+'''
+            for idx, line in enumerate(label_lines):
+                is_repo_line = idx < len(repo_lines)
+                font_size = 10 if is_repo_line else 9
+                font_color = "#FF5722" if is_repo_line else "#999"
+                font_weight = "bold" if is_repo_line else "normal"
+                line_y = label_top + label_line_height * (idx + 1)
+                svg += f'''    <text x="{label_x}" y="{line_y}" font-size="{font_size}" fill="{font_color}" font-weight="{font_weight}" text-anchor="{text_anchor}">{line}</text>
 '''
         else:
             # Regular point (only show every Nth point to avoid clutter)
@@ -238,7 +294,7 @@ def generate_star_trend_svg(history: List[Dict], repo_creations: Dict[str, List[
   
   <!-- Stats -->
   <text x="20" y="''' + str(height - 40) + '''" font-size="11" fill="#666">Total: ''' + str(max_stars) + ''' ⭐</text>
-  <text x="20" y="''' + str(height - 25) + '''" font-size="11" fill="#666">Repos created: ''' + str(len(repo_creations)) + '''</text>
+  <text x="20" y="''' + str(height - 25) + '''" font-size="11" fill="#666">Repos created: ''' + str(total_repos_created) + '''</text>
   <text x="20" y="''' + str(height - 10) + '''" font-size="11" fill="#999">Generated: ''' + datetime.now().strftime('%Y-%m-%d') + '''</text>
 </svg>'''
     
@@ -268,14 +324,15 @@ def fetch_github_data(username: str) -> Dict:
         print(f"Warning: Error fetching user data: {e}")
         print(f"Using fallback data for {username}")
         # Return minimal user data as fallback
+        is_toby = username in ['tobylai-toby', 'tobylaifun']
         return {
             'login': username,
-            'name': 'Toby Lai' if username in ['tobylai-toby', 'tobylaifun'] else username,
-            'bio': None,
-            'blog': 'https://tobylai.fun' if username in ['tobylai-toby', 'tobylaifun'] else '',
+            'name': 'Toby Lai' if is_toby else username,
+            'bio': 'focusing on interesting things' if is_toby else None,
+            'blog': 'https://tobylai.fun' if is_toby else '',
             'location': '',
-            'public_repos': 72,
-            'followers': 59
+            'public_repos': 19 if is_toby else 0,
+            'followers': 59 if is_toby else 0
         }
 
 
@@ -445,6 +502,12 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     # Calculate total stars
     total_stars = sum(r.get('stargazers_count', 0) for r in own_repos)
     
+    for svg_file in glob.glob('star-history*.svg'):
+        try:
+            os.remove(svg_file)
+        except OSError as e:
+            print(f"Warning: Could not remove {svg_file}: {e}")
+    
     # Fetch star history from GitHub API (only if not mock mode)
     star_history = []
     repo_creations = {}
@@ -454,13 +517,15 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     
     # Generate SVG chart if we have history data
     star_chart_svg = ""
+    star_chart_filename = ""
     if star_history and len(star_history) >= 2:
         star_chart_svg = generate_star_trend_svg(star_history, repo_creations, username)
         # Save SVG to file
-        svg_filename = 'star-history.svg'
-        with open(svg_filename, 'w', encoding='utf-8') as f:
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        star_chart_filename = f'star-history-{timestamp}.svg'
+        with open(star_chart_filename, 'w', encoding='utf-8') as f:
             f.write(star_chart_svg)
-        print(f"Star trend chart saved to {svg_filename}")
+        print(f"Star trend chart saved to {star_chart_filename}")
     
     # Get user info
     name = user_data.get('name', username)
@@ -618,12 +683,14 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
         # Display the SVG chart
         first_star = star_history[0]
         last_star = star_history[-1]
-        days_span = len(star_history)
-        num_repos_created = len(repo_creations)
+        start_date = datetime.strptime(first_star['date'], '%Y-%m-%d')
+        end_date = datetime.strptime(last_star['date'], '%Y-%m-%d')
+        days_span = (end_date - start_date).days + 1
+        num_repos_created = sum(len(repos) for repos in repo_creations.values())
         
         readme += f"""### ⭐ Total Stars Growth Trend / 总星标增长趋势
 
-![Star History Chart](star-history.svg)
+![Star History Chart]({star_chart_filename})
 
 **Summary / 摘要:**
 - 📅 From {first_star['date']} to {last_star['date']} ({days_span} days)

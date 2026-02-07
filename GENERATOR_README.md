@@ -11,6 +11,7 @@ This repository contains a Python script that automatically generates a GitHub p
 - 🌐 Bilingual support (English/Chinese)
 - 🎨 Beautiful badges and formatting
 - 📈 GitHub stats visualizations
+- 🕒 Star history SVG files are timestamped and older star-history*.svg files are cleaned up each run
 
 ## How it Works
 
