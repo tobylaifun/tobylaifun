@@ -5,7 +5,8 @@ This repository contains a Python script that automatically generates a GitHub p
 ## Features
 
 - 📊 Fetches real-time GitHub statistics (repositories, stars, followers)
-- ⭐ Lists your top repositories sorted by star count
+- ⭐ Lists your top repositories with intelligent ranking (pinned repos count as +6 stars)
+- 📌 Fetches pinned repositories and merges them into recommendations
 - 🤖 Automatic daily updates via GitHub Actions
 - 🌐 Bilingual support (English/Chinese)
 - 🎨 Beautiful badges and formatting
@@ -16,10 +17,13 @@ This repository contains a Python script that automatically generates a GitHub p
 The `generate_readme.py` script:
 1. Fetches user data from the GitHub API
 2. Retrieves all user repositories
-3. Filters out forks and sorts by star count
-4. Generates a formatted README with:
+3. Fetches pinned repositories via GraphQL API
+4. Filters out forks and ranks by combined pin+star score
+   - Pinned repositories get +6 stars bonus for ranking
+   - Display still shows actual star count
+5. Generates a formatted README with:
    - User statistics (repos, stars, followers)
-   - Top repositories table ranked by stars
+   - Top repositories table ranked by pin+star score
    - Featured projects section
    - Technology preferences
    - Contact links
