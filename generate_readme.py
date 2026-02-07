@@ -12,87 +12,108 @@ import urllib.request
 import urllib.error
 
 
-def save_star_history(total_stars: int, history_file: str = 'star_history.json'):
-    """Save today's total stars to history file"""
-    today = datetime.now().strftime('%Y-%m-%d')
+def fetch_repo_stargazers_history(owner: str, repo: str, max_stars: int = 100) -> List[Dict]:
+    """Fetch stargazer timestamps for a repository using GitHub API
     
-    # Load existing history
-    history = []
-    if os.path.exists(history_file):
-        try:
-            with open(history_file, 'r') as f:
-                history = json.load(f)
-        except (json.JSONDecodeError, IOError):
-            history = []
+    Returns list of {'starred_at': 'timestamp'} for each star
+    Note: Limited to max_stars to avoid rate limiting
+    """
+    stargazers = []
+    page = 1
+    per_page = 100
     
-    # Check if today's entry already exists
-    today_exists = False
-    for entry in history:
-        if entry.get('date') == today:
-            entry['stars'] = total_stars
-            today_exists = True
-            break
+    headers = {
+        'User-Agent': 'Mozilla/5.0',
+        'Accept': 'application/vnd.github.v3.star+json'  # Get star timestamps
+    }
     
-    # Add new entry if not exists
-    if not today_exists:
-        history.append({
-            'date': today,
-            'stars': total_stars
+    # Add token if available
+    github_token = os.environ.get('GITHUB_TOKEN')
+    if github_token:
+        headers['Authorization'] = f'token {github_token}'
+    
+    try:
+        while len(stargazers) < max_stars:
+            url = f"https://api.github.com/repos/{owner}/{repo}/stargazers?page={page}&per_page={per_page}"
+            req = urllib.request.Request(url, headers=headers)
+            
+            with urllib.request.urlopen(req, timeout=10) as response:
+                data = json.loads(response.read().decode())
+                if not data:
+                    break
+                
+                for item in data:
+                    if 'starred_at' in item:
+                        stargazers.append({
+                            'starred_at': item['starred_at'],
+                            'repo': repo
+                        })
+                
+                if len(data) < per_page:
+                    break
+                    
+                page += 1
+                
+                # Stop if we've collected enough
+                if len(stargazers) >= max_stars:
+                    break
+                    
+    except Exception as e:
+        print(f"Warning: Could not fetch stargazers for {owner}/{repo}: {e}")
+    
+    return stargazers
+
+
+def aggregate_star_history(username: str, repos: List[Dict], max_per_repo: int = 100) -> List[Dict]:
+    """Aggregate star history from all repositories
+    
+    Returns list of {'date': 'YYYY-MM-DD', 'stars': count} sorted by date
+    """
+    from collections import defaultdict
+    
+    all_stargazers = []
+    
+    # Fetch stargazers for top repositories (by star count)
+    sorted_repos = sorted(repos, key=lambda x: x.get('stargazers_count', 0), reverse=True)
+    
+    print(f"Fetching star history for top repositories...")
+    for repo in sorted_repos[:10]:  # Limit to top 10 repos to avoid rate limiting
+        repo_name = repo['name']
+        star_count = repo.get('stargazers_count', 0)
+        
+        if star_count == 0:
+            continue
+            
+        print(f"  Fetching {repo_name} ({star_count} stars)...")
+        stargazers = fetch_repo_stargazers_history(username, repo_name, max_per_repo)
+        all_stargazers.extend(stargazers)
+    
+    if not all_stargazers:
+        print("No star history data available")
+        return []
+    
+    # Aggregate by date
+    daily_stars = defaultdict(int)
+    for star in all_stargazers:
+        date = star['starred_at'][:10]  # Extract YYYY-MM-DD
+        daily_stars[date] += 1
+    
+    # Convert to cumulative sum
+    sorted_dates = sorted(daily_stars.keys())
+    cumulative = []
+    total = 0
+    
+    for date in sorted_dates:
+        total += daily_stars[date]
+        cumulative.append({
+            'date': date,
+            'stars': total
         })
     
-    # Keep last 365 days
-    if len(history) > 365:
-        history = history[-365:]
-    
-    # Save updated history
-    with open(history_file, 'w') as f:
-        json.dump(history, f, indent=2)
-    
-    print(f"Star history updated: {today} -> {total_stars} stars")
-    return history
+    print(f"Generated star history: {len(cumulative)} data points")
+    return cumulative
 
 
-def generate_star_chart_svg(history: List[Dict], username: str) -> str:
-    """Generate a simple SVG chart from star history"""
-    if len(history) < 2:
-        return ""
-    
-    # SVG dimensions
-    width = 800
-    height = 200
-    padding = 40
-    chart_width = width - 2 * padding
-    chart_height = height - 2 * padding
-    
-    # Get data points
-    dates = [entry['date'] for entry in history]
-    stars = [entry['stars'] for entry in history]
-    
-    max_stars = max(stars) if stars else 1
-    min_stars = min(stars) if stars else 0
-    star_range = max_stars - min_stars if max_stars > min_stars else 1
-    
-    # Generate SVG path
-    points = []
-    for i, (date, star_count) in enumerate(zip(dates, stars)):
-        x = padding + (i / (len(dates) - 1)) * chart_width
-        y = padding + chart_height - ((star_count - min_stars) / star_range) * chart_height
-        points.append(f"{x},{y}")
-    
-    path_data = "M " + " L ".join(points)
-    
-    # Create SVG
-    svg = f'''<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="{width}" height="{height}" fill="#ffffff"/>
-  <text x="{width//2}" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Total Stars Growth Trend / 总星标增长趋势</text>
-  <text x="{padding}" y="{padding - 10}" font-size="12" fill="#666">{max_stars} ⭐</text>
-  <text x="{padding}" y="{height - 10}" font-size="12" fill="#666">{min_stars} ⭐</text>
-  <text x="{width - padding}" y="{height - 10}" text-anchor="end" font-size="10" fill="#999">{dates[-1]}</text>
-  <text x="{padding}" y="{height - 10}" font-size="10" fill="#999">{dates[0]}</text>
-  <path d="{path_data}" stroke="#4CAF50" stroke-width="3" fill="none"/>
-  <circle cx="{padding + chart_width}" cy="{padding + chart_height - ((stars[-1] - min_stars) / star_range) * chart_height}" r="4" fill="#4CAF50"/>
-</svg>'''
-    
     return svg
 
 
@@ -294,6 +315,12 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     # Calculate total stars
     total_stars = sum(r.get('stargazers_count', 0) for r in own_repos)
     
+    # Fetch star history from GitHub API (only if not mock mode)
+    star_history = []
+    if not use_mock and total_stars > 0:
+        print(f"\nFetching star history from GitHub API...")
+        star_history = aggregate_star_history(username, own_repos)
+    
     # Get user info
     name = user_data.get('name', username)
     bio = user_data.get('bio', '')
@@ -443,7 +470,26 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 ### 📈 GitHub Contribution Graph / GitHub 贡献图
 ![](https://ghchart.rshah.org/{username})
 
-### 📊 GitHub Profile Views / 访问统计
+"""
+    
+    # Add star history chart if data available
+    if star_history and len(star_history) >= 2:
+        # Create a simple text-based display of star growth
+        first_star = star_history[0]
+        last_star = star_history[-1]
+        days_span = len(star_history)
+        
+        readme += f"""### ⭐ Total Stars Growth Trend / 总星标增长趋势
+
+**Star History Summary / 星标历史摘要:**
+- 📅 First Star: {first_star['date']} ({first_star['stars']} stars)
+- 📅 Latest: {last_star['date']} ({last_star['stars']} stars) 
+- 📈 Growth: +{last_star['stars'] - first_star['stars']} stars over {days_span} days
+- 💫 Average: ~{(last_star['stars'] - first_star['stars']) / days_span:.2f} stars/day
+
+"""
+    
+    readme += f"""### 📊 GitHub Profile Views / 访问统计
 ![](https://komarev.com/ghpvc/?username={username}&color=brightgreen&style=flat-square&label=Profile+Views)
 
 </div>
