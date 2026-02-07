@@ -48,6 +48,11 @@ def fetch_pinned_repos(username: str) -> List[str]:
     """Fetch pinned repositories for a user using GraphQL API"""
     pinned_repos = []
     
+    # Validate username to prevent injection
+    if not username or not username.replace('-', '').replace('_', '').isalnum():
+        print(f"Warning: Invalid username format: {username}")
+        return pinned_repos
+    
     query = """
     {
       user(login: "%s") {
