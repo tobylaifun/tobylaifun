@@ -526,6 +526,8 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
         print(f"Star trend chart saved to {star_chart_filename}")
         
         # Delete old star history SVG files, keep only the newest one
+        # Note: Files are sorted lexicographically by name. Since filenames use
+        # timestamp format YYYYMMDDHHMMSS, newer files sort last
         all_star_svgs = sorted(glob.glob('star-history-*.svg'))
         if len(all_star_svgs) > 1:
             # Keep the newest (last in sorted list), delete others
