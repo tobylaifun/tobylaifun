@@ -261,7 +261,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 
 """
     else:
-        readme += """focusing on interesting things
+        readme += """💻 Full-stack developer passionate about open source and creative coding.
 
 """
     
@@ -320,7 +320,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     readme += """![React](https://img.shields.io/badge/React-61dafb?logo=react&logoColor=black)
 ![Vue.js](https://img.shields.io/badge/Vue.js-42b883?logo=vue.js&logoColor=white)
 
-喜欢 TypeScript、Node.js、Python，也关注新兴的 Deno/Bun。前端偏爱 React/Vue，业余也折腾 Minecraft、平台开发等。
+热爱 TypeScript、Node.js 和 Python 等技术栈，积极探索 Deno、Bun 等新兴运行时。前端方面偏好 React 和 Vue 框架，业余时间也喜欢研究 Minecraft 开发、游戏平台搭建等有趣的项目。
 
 ---
 
@@ -353,8 +353,8 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 
 ---
 
-_Thanks for visiting! Feel free to explore my work or connect for collaboration._  
-_感谢访问，欢迎交流或一起折腾！_
+_Thanks for visiting! Feel free to explore my projects and reach out for collaboration or discussion._  
+_感谢访问！欢迎探索我的项目，也期待与你交流合作。_
 
 ---
 
