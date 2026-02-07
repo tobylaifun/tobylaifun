@@ -517,6 +517,19 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     star_chart_svg = ""
     star_chart_filename = ""
     if star_history and len(star_history) >= 2:
+        # Delete all old star history SVG files BEFORE creating new one
+        # This prevents accumulation of old files in the repository
+        all_star_svgs = sorted(glob.glob('star-history-*.svg'))
+        if all_star_svgs:
+            print(f"Found {len(all_star_svgs)} existing star-history files, deleting them...")
+            for old_svg in all_star_svgs:
+                try:
+                    os.remove(old_svg)
+                    print(f"Removed old star history file: {old_svg}")
+                except OSError as e:
+                    print(f"Warning: Could not remove {old_svg}: {e}")
+        
+        # Now create the new SVG file
         star_chart_svg = generate_star_trend_svg(star_history, repo_creations, username)
         # Save SVG to file
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -524,19 +537,6 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
         with open(star_chart_filename, 'w', encoding='utf-8') as f:
             f.write(star_chart_svg)
         print(f"Star trend chart saved to {star_chart_filename}")
-        
-        # Delete old star history SVG files, keep only the newest one
-        # Note: Files are sorted lexicographically by name. Since filenames use
-        # timestamp format YYYYMMDDHHMMSS, newer files sort last
-        all_star_svgs = sorted(glob.glob('star-history-*.svg'))
-        if len(all_star_svgs) > 1:
-            # Keep the newest (last in sorted list), delete others
-            for old_svg in all_star_svgs[:-1]:
-                try:
-                    os.remove(old_svg)
-                    print(f"Removed old star history file: {old_svg}")
-                except OSError as e:
-                    print(f"Warning: Could not remove {old_svg}: {e}")
     
     # Get user info
     name = user_data.get('name', username)
