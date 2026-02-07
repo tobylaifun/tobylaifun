@@ -97,8 +97,8 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
         }
         repos = [
             {
-                'name': 'tobylai-toby',
-                'html_url': 'https://github.com/tobylaifun/tobylai-toby',
+                'name': 'tobylaifun',
+                'html_url': 'https://github.com/tobylaifun/tobylaifun',
                 'description': 'My GitHub profile README',
                 'stargazers_count': 5,
                 'language': 'Python',
@@ -148,7 +148,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 """
     
     # Add organization badge if exists
-    if username == "tobylai-toby":
+    if username in ["tobylai-toby", "tobylaifun"]:
         readme += """  <a href="https://github.com/Box3TRC">
     <img src="https://img.shields.io/badge/org-Box3TRC-blueviolet?logo=github" alt="Box3TRC Organization" />
   </a>
@@ -161,8 +161,8 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
   </a>
 """
     
-    # Add dao3.fun if this is tobylai-toby
-    if username == "tobylai-toby":
+    # Add dao3.fun if this is tobylai-toby or tobylaifun
+    if username in ["tobylai-toby", "tobylaifun"]:
         readme += """  <a href="https://dao3.fun">
     <img src="https://img.shields.io/badge/dao3.fun-platform-1e90ff" alt="dao3.fun" />
   </a>
@@ -185,8 +185,8 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 
 """
     
-    # Add dao3.fun info for tobylai-toby
-    if username == "tobylai-toby":
+    # Add dao3.fun info for tobylai-toby or tobylaifun
+    if username in ["tobylai-toby", "tobylaifun"]:
         readme += """I love [dao3.fun](https://dao3.fun), a platform for creating & playing maps!  
 也热爱 [dao3.fun 神奇代码岛](https://dao3.fun)，一个属于创作者和玩家的地图平台。
 
@@ -224,8 +224,8 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
         
         readme += "\n---\n\n"
     
-    # Add featured projects section (keeping the original if tobylai-toby)
-    if username == "tobylai-toby":
+    # Add featured projects section (keeping the original if tobylai-toby or tobylaifun)
+    if username in ["tobylai-toby", "tobylaifun"]:
         readme += """## ✨ Featured Projects / 特色项目
 
 | Project | Description | Main Techs | Status |
@@ -250,7 +250,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 ![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white)
 """
     
-    if username == "tobylai-toby":
+    if username in ["tobylai-toby", "tobylaifun"]:
         readme += """[![dao3.fun](https://img.shields.io/badge/dao3.fun-platform-1e90ff)](https://dao3.fun)
 """
     
@@ -272,7 +272,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
         blog_display = blog.replace('https://', '').replace('http://', '')
         readme += f"- 📝 [Blog {blog_display}]({blog})\n"
     
-    if username == "tobylai-toby":
+    if username in ["tobylai-toby", "tobylaifun"]:
         readme += """- 🤝 [@Box3TRC Organization](https://github.com/Box3TRC)  
 - 💬 [dao3.fun](https://dao3.fun)  
 """
@@ -304,7 +304,7 @@ _感谢访问，欢迎交流或一起折腾！_
 def main():
     """Main function"""
     # Get username from command line or environment
-    username = sys.argv[1] if len(sys.argv) > 1 else os.environ.get('GITHUB_REPOSITORY_OWNER', 'tobylai-toby')
+    username = sys.argv[1] if len(sys.argv) > 1 else os.environ.get('GITHUB_REPOSITORY_OWNER', 'tobylaifun')
     
     # Check for mock mode
     use_mock = '--mock' in sys.argv or os.environ.get('USE_MOCK', '').lower() == 'true'
