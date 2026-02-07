@@ -12,6 +12,90 @@ import urllib.request
 import urllib.error
 
 
+def save_star_history(total_stars: int, history_file: str = 'star_history.json'):
+    """Save today's total stars to history file"""
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    # Load existing history
+    history = []
+    if os.path.exists(history_file):
+        try:
+            with open(history_file, 'r') as f:
+                history = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            history = []
+    
+    # Check if today's entry already exists
+    today_exists = False
+    for entry in history:
+        if entry.get('date') == today:
+            entry['stars'] = total_stars
+            today_exists = True
+            break
+    
+    # Add new entry if not exists
+    if not today_exists:
+        history.append({
+            'date': today,
+            'stars': total_stars
+        })
+    
+    # Keep last 365 days
+    if len(history) > 365:
+        history = history[-365:]
+    
+    # Save updated history
+    with open(history_file, 'w') as f:
+        json.dump(history, f, indent=2)
+    
+    print(f"Star history updated: {today} -> {total_stars} stars")
+    return history
+
+
+def generate_star_chart_svg(history: List[Dict], username: str) -> str:
+    """Generate a simple SVG chart from star history"""
+    if len(history) < 2:
+        return ""
+    
+    # SVG dimensions
+    width = 800
+    height = 200
+    padding = 40
+    chart_width = width - 2 * padding
+    chart_height = height - 2 * padding
+    
+    # Get data points
+    dates = [entry['date'] for entry in history]
+    stars = [entry['stars'] for entry in history]
+    
+    max_stars = max(stars) if stars else 1
+    min_stars = min(stars) if stars else 0
+    star_range = max_stars - min_stars if max_stars > min_stars else 1
+    
+    # Generate SVG path
+    points = []
+    for i, (date, star_count) in enumerate(zip(dates, stars)):
+        x = padding + (i / (len(dates) - 1)) * chart_width
+        y = padding + chart_height - ((star_count - min_stars) / star_range) * chart_height
+        points.append(f"{x},{y}")
+    
+    path_data = "M " + " L ".join(points)
+    
+    # Create SVG
+    svg = f'''<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="{width}" height="{height}" fill="#ffffff"/>
+  <text x="{width//2}" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">Total Stars Growth Trend / 总星标增长趋势</text>
+  <text x="{padding}" y="{padding - 10}" font-size="12" fill="#666">{max_stars} ⭐</text>
+  <text x="{padding}" y="{height - 10}" font-size="12" fill="#666">{min_stars} ⭐</text>
+  <text x="{width - padding}" y="{height - 10}" text-anchor="end" font-size="10" fill="#999">{dates[-1]}</text>
+  <text x="{padding}" y="{height - 10}" font-size="10" fill="#999">{dates[0]}</text>
+  <path d="{path_data}" stroke="#4CAF50" stroke-width="3" fill="none"/>
+  <circle cx="{padding + chart_width}" cy="{padding + chart_height - ((stars[-1] - min_stars) / star_range) * chart_height}" r="4" fill="#4CAF50"/>
+</svg>'''
+    
+    return svg
+
+
 def fetch_github_data(username: str) -> Dict:
     """Fetch user data from GitHub API"""
     url = f"https://api.github.com/users/{username}"
