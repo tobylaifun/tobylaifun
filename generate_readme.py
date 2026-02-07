@@ -214,9 +214,8 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
             repo_name = repo['name']
             repo_url = repo['html_url']
             description = repo.get('description') or 'No description'
-            description = description[:80]
-            if len(repo.get('description') or '') > 80:
-                description += '...'
+            if len(description) > 80:
+                description = description[:80] + '...'
             stars = repo.get('stargazers_count', 0)
             language = repo.get('language', 'N/A')
             updated = repo.get('updated_at', '')[:10]
