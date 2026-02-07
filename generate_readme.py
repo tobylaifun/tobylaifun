@@ -35,12 +35,12 @@ def fetch_github_data(username: str) -> Dict:
         # Return minimal user data as fallback
         return {
             'login': username,
-            'name': username,
+            'name': 'Toby Lai' if username in ['tobylai-toby', 'tobylaifun'] else username,
             'bio': None,
-            'blog': '',
+            'blog': 'https://tobylai.fun' if username in ['tobylai-toby', 'tobylaifun'] else '',
             'location': '',
-            'public_repos': 0,
-            'followers': 0
+            'public_repos': 72,
+            'followers': 59
         }
 
 
@@ -73,6 +73,14 @@ def fetch_user_repos(username: str) -> List[Dict]:
         except urllib.error.HTTPError as e:
             print(f"Warning: Error fetching repos: {e}")
             print("Using fallback repository data")
+            # Try to load from cache file if it exists
+            try:
+                if os.path.exists('repos_cache.json'):
+                    with open('repos_cache.json', 'r') as f:
+                        repos = json.load(f)
+                        print(f"Loaded {len(repos)} repos from cache")
+            except Exception as cache_err:
+                print(f"Could not load cache: {cache_err}")
             break
     
     return repos
@@ -180,8 +188,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 
 """
     else:
-        readme += """I'm passionate about building creative and fun things: extensions, CLIs, web tools, LLM apps, and more.  
-喜欢做各种有趣的项目，比如扩展、命令行工具、Web 应用、AI App等。
+        readme += """focusing on interesting things
 
 """
     
@@ -203,7 +210,24 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 
 """
     
-    # Add top repositories section
+    # Add featured projects section FIRST (keeping the original if tobylai-toby or tobylaifun)
+    if username in ["tobylai-toby", "tobylaifun"]:
+        readme += """## ✨ Featured Projects / 特色项目
+
+| Project | Description | Main Techs | Status |
+| ------- | ----------- | ---------- | ------ |
+| [Arenaless](https://github.com/Box3TRC/ArenaLess) | Dao3 Arena TypeScript programming with vscode.dev support<br>Dao3 Arena编辑器 TypeScript 编程，支持 vscode.dev | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Active |
+| [Box3Convert](https://github.com/Box3TRC/Box3Convert) | Tools for Dao3/Box3 format & resource conversion<br>Dao3/Box3 资源格式转换小工具(方块/模型/俯视图转化) | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) | Active |
+| [OnlineObj2Voxel](https://github.com/tobylai-toby/OnlineObj2Voxel) | Online OBJ-to-voxel converter for Dao3/Box3 (JS+WASM)<br>OBJ 模型在线转体素，支持 Dao3/Box3，JS+WASM | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) ![WebAssembly](https://img.shields.io/badge/WASM-blueviolet?logo=webassembly&logoColor=white) | Active |
+| [Areact](https://github.com/Box3TRC/Areact) | Arena + React: React framework UI for Dao3 (experimental)<br>Dao3 的 React 框架 UI（实验性，TypeScript） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Experimental |
+| [daopy-runtime](https://github.com/tobylai-toby/daopy-runtime) | Run Python on Dao3, API integration (TypeScript/Python)<br>Dao3 上运行 Python 的运行时（Arenaless包含此在线模板） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) ![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white) | Active |
+| [QMCLI](https://github.com/tobylai-toby/QMCLI) | Quick Minecraft Launcher CLI (archived)<br>快速 Minecraft 启动器 CLI（已归档） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Archived |
+
+---
+
+"""
+    
+    # Add top repositories section AFTER featured projects
     if top_repos:
         readme += """## ⭐ Top Repositories by Stars / 星标排名项目
 
@@ -223,23 +247,6 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
             readme += f"| [{repo_name}]({repo_url}) | {description} | ⭐ {stars} | {language} | {updated} |\n"
         
         readme += "\n---\n\n"
-    
-    # Add featured projects section (keeping the original if tobylai-toby or tobylaifun)
-    if username in ["tobylai-toby", "tobylaifun"]:
-        readme += """## ✨ Featured Projects / 特色项目
-
-| Project | Description | Main Techs | Status |
-| ------- | ----------- | ---------- | ------ |
-| [Arenaless](https://github.com/Box3TRC/ArenaLess) | Dao3 Arena TypeScript programming with vscode.dev support<br>Dao3 Arena编辑器 TypeScript 编程，支持 vscode.dev | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Active |
-| [Box3Convert](https://github.com/Box3TRC/Box3Convert) | Tools for Dao3/Box3 format & resource conversion<br>Dao3/Box3 资源格式转换小工具(方块/模型/俯视图转化) | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) | Active |
-| [OnlineObj2Voxel](https://github.com/tobylai-toby/OnlineObj2Voxel) | Online OBJ-to-voxel converter for Dao3/Box3 (JS+WASM)<br>OBJ 模型在线转体素，支持 Dao3/Box3，JS+WASM | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) ![WebAssembly](https://img.shields.io/badge/WASM-blueviolet?logo=webassembly&logoColor=white) | Active |
-| [Areact](https://github.com/Box3TRC/Areact) | Arena + React: React framework UI for Dao3 (experimental)<br>Dao3 的 React 框架 UI（实验性，TypeScript） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Experimental |
-| [daopy-runtime](https://github.com/tobylai-toby/daopy-runtime) | Run Python on Dao3, API integration (TypeScript/Python)<br>Dao3 上运行 Python 的运行时（Arenaless包含此在线模板） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) ![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white) | Active |
-| [QMCLI](https://github.com/tobylai-toby/QMCLI) | Quick Minecraft Launcher CLI (archived)<br>快速 Minecraft 启动器 CLI（已归档） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Archived |
-
----
-
-"""
     
     # Add preferences section
     readme += """## ❤️ What I Like / 偏好
