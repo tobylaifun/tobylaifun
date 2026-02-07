@@ -359,6 +359,9 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 ### 📈 GitHub Contribution Graph / GitHub 贡献图
 ![](https://ghchart.rshah.org/{username})
 
+### ⭐ Top Repositories Star Trend / 主要仓库星标趋势
+[![Star History Chart](https://api.star-history.com/svg?repos={username}/hexo-theme-mdsuper,{username}/OnlineObj2Voxel,{username}/daopy-runtime,{username}/dao3up,{username}/QMCLI&type=Date)](https://star-history.com/#{username}/hexo-theme-mdsuper&{username}/OnlineObj2Voxel&{username}/daopy-runtime&{username}/dao3up&{username}/QMCLI&Date)
+
 ### 📊 GitHub Profile Views / 访问统计
 ![](https://komarev.com/ghpvc/?username={username}&color=brightgreen&style=flat-square&label=Profile+Views)
 
