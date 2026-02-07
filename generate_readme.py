@@ -283,24 +283,7 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
 
 """
     
-    # Add featured projects section FIRST (keeping the original if tobylai-toby or tobylaifun)
-    if username in ["tobylai-toby", "tobylaifun"]:
-        readme += """## ✨ Featured Projects / 特色项目
-
-| Project | Description | Main Techs | Status |
-| ------- | ----------- | ---------- | ------ |
-| [Arenaless](https://github.com/Box3TRC/ArenaLess) | Dao3 Arena TypeScript programming with vscode.dev support<br>Dao3 Arena编辑器 TypeScript 编程，支持 vscode.dev | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Active |
-| [Box3Convert](https://github.com/Box3TRC/Box3Convert) | Tools for Dao3/Box3 format & resource conversion<br>Dao3/Box3 资源格式转换小工具(方块/模型/俯视图转化) | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) | Active |
-| [OnlineObj2Voxel](https://github.com/tobylai-toby/OnlineObj2Voxel) | Online OBJ-to-voxel converter for Dao3/Box3 (JS+WASM)<br>OBJ 模型在线转体素，支持 Dao3/Box3，JS+WASM | ![JavaScript](https://img.shields.io/badge/JavaScript-f7df1e?logo=javascript&logoColor=black) ![WebAssembly](https://img.shields.io/badge/WASM-blueviolet?logo=webassembly&logoColor=white) | Active |
-| [Areact](https://github.com/Box3TRC/Areact) | Arena + React: React framework UI for Dao3 (experimental)<br>Dao3 的 React 框架 UI（实验性，TypeScript） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Experimental |
-| [daopy-runtime](https://github.com/tobylai-toby/daopy-runtime) | Run Python on Dao3, API integration (TypeScript/Python)<br>Dao3 上运行 Python 的运行时（Arenaless包含此在线模板） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) ![Python](https://img.shields.io/badge/Python-3776ab?logo=python&logoColor=white) | Active |
-| [QMCLI](https://github.com/tobylai-toby/QMCLI) | Quick Minecraft Launcher CLI (archived)<br>快速 Minecraft 启动器 CLI（已归档） | ![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white) | Archived |
-
----
-
-"""
-    
-    # Add top repositories section AFTER featured projects
+    # Add top repositories section
     if top_repos:
         readme += """## ⭐ 推荐项目 / Recommended Projects
 
