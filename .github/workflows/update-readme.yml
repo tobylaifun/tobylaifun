@@ -33,13 +33,13 @@ jobs:
       - name: Check for changes
         id: verify_diff
         run: |
-          git diff --quiet README.md star-history*.svg || echo "changed=true" >> $GITHUB_OUTPUT
+          git add -A
+          git diff --quiet --cached || echo "changed=true" >> $GITHUB_OUTPUT
       
       - name: Commit and push if changed
         if: steps.verify_diff.outputs.changed == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add README.md star-history*.svg
           git commit -m "chore: auto-update profile README [skip ci]"
           git push
