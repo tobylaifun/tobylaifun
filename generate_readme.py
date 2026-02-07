@@ -64,14 +64,17 @@ def fetch_repo_stargazers_history(owner: str, repo: str, max_stars: int = 100) -
     return stargazers
 
 
-def aggregate_star_history(username: str, repos: List[Dict], max_per_repo: int = 100) -> List[Dict]:
+def aggregate_star_history(username: str, repos: List[Dict], max_per_repo: int = 100) -> tuple:
     """Aggregate star history from all repositories
     
-    Returns list of {'date': 'YYYY-MM-DD', 'stars': count} sorted by date
+    Returns tuple: (history_list, repo_creations)
+    - history_list: [{'date': 'YYYY-MM-DD', 'stars': count}] sorted by date
+    - repo_creations: {date: [repo_name1, repo_name2, ...]} repos created on that date
     """
     from collections import defaultdict
     
     all_stargazers = []
+    repo_creations = defaultdict(list)
     
     # Fetch stargazers for top repositories (by star count)
     sorted_repos = sorted(repos, key=lambda x: x.get('stargazers_count', 0), reverse=True)
@@ -80,17 +83,22 @@ def aggregate_star_history(username: str, repos: List[Dict], max_per_repo: int =
     for repo in sorted_repos[:10]:  # Limit to top 10 repos to avoid rate limiting
         repo_name = repo['name']
         star_count = repo.get('stargazers_count', 0)
+        created_at = repo.get('created_at', '')[:10]  # Extract YYYY-MM-DD
+        
+        # Track repo creation date
+        if created_at:
+            repo_creations[created_at].append(repo_name)
         
         if star_count == 0:
             continue
             
-        print(f"  Fetching {repo_name} ({star_count} stars)...")
+        print(f"  Fetching {repo_name} ({star_count} stars, created {created_at})...")
         stargazers = fetch_repo_stargazers_history(username, repo_name, max_per_repo)
         all_stargazers.extend(stargazers)
     
     if not all_stargazers:
         print("No star history data available")
-        return []
+        return [], {}
     
     # Aggregate by date
     daily_stars = defaultdict(int)
@@ -111,10 +119,126 @@ def aggregate_star_history(username: str, repos: List[Dict], max_per_repo: int =
         })
     
     print(f"Generated star history: {len(cumulative)} data points")
-    return cumulative
+    print(f"Repository creations tracked: {len(repo_creations)} dates")
+    return cumulative, dict(repo_creations)
 
 
+def generate_star_trend_svg(history: List[Dict], repo_creations: Dict[str, List[str]], username: str) -> str:
+    """Generate SVG chart showing star growth with repo creation markers"""
+    if len(history) < 2:
+        return ""
+    
+    # SVG dimensions
+    width = 900
+    height = 400
+    padding_left = 60
+    padding_right = 40
+    padding_top = 60
+    padding_bottom = 80
+    chart_width = width - padding_left - padding_right
+    chart_height = height - padding_top - padding_bottom
+    
+    # Get data
+    dates = [entry['date'] for entry in history]
+    stars = [entry['stars'] for entry in history]
+    
+    max_stars = max(stars)
+    min_stars = 0
+    star_range = max_stars if max_stars > 0 else 1
+    
+    # Helper function to convert data to coordinates
+    def get_x(index):
+        return padding_left + (index / (len(dates) - 1)) * chart_width
+    
+    def get_y(star_count):
+        return padding_top + chart_height - ((star_count - min_stars) / star_range) * chart_height
+    
+    # Generate path for the star trend line
+    points = []
+    for i, star_count in enumerate(stars):
+        x = get_x(i)
+        y = get_y(star_count)
+        points.append(f"{x},{y}")
+    
+    path_data = "M " + " L ".join(points)
+    
+    # Create SVG
+    svg = f'''<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="{width}" height="{height}" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="{width//2}" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#333">
+    ⭐ Total Stars Growth Trend / 总星标增长趋势
+  </text>
+  
+  <!-- Y-axis labels -->
+  <text x="{padding_left - 10}" y="{padding_top}" text-anchor="end" font-size="12" fill="#666">{max_stars}</text>
+  <text x="{padding_left - 10}" y="{padding_top + chart_height}" text-anchor="end" font-size="12" fill="#666">{min_stars}</text>
+  <text x="{padding_left - 10}" y="{padding_top + chart_height//2}" text-anchor="end" font-size="12" fill="#666">{max_stars//2}</text>
+  
+  <!-- Grid lines -->
+  <line x1="{padding_left}" y1="{padding_top}" x2="{padding_left + chart_width}" y2="{padding_top}" stroke="#e0e0e0" stroke-width="1"/>
+  <line x1="{padding_left}" y1="{padding_top + chart_height//2}" x2="{padding_left + chart_width}" y2="{padding_top + chart_height//2}" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="{padding_left}" y1="{padding_top + chart_height}" x2="{padding_left + chart_width}" y2="{padding_top + chart_height}" stroke="#666" stroke-width="2"/>
+  
+  <!-- Axes -->
+  <line x1="{padding_left}" y1="{padding_top}" x2="{padding_left}" y2="{padding_top + chart_height}" stroke="#666" stroke-width="2"/>
+  
+  <!-- X-axis labels -->
+  <text x="{padding_left}" y="{height - padding_bottom + 20}" text-anchor="start" font-size="11" fill="#999">{dates[0]}</text>
+  <text x="{padding_left + chart_width}" y="{height - padding_bottom + 20}" text-anchor="end" font-size="11" fill="#999">{dates[-1]}</text>
+  
+  <!-- Star trend line -->
+  <path d="{path_data}" stroke="#4CAF50" stroke-width="3" fill="none"/>
+  
+  <!-- Regular data points -->
+  <g>
+'''
+    
+    # Add data points
+    for i, (date, star_count) in enumerate(zip(dates, stars)):
+        x = get_x(i)
+        y = get_y(star_count)
+        
+        # Check if this date has repo creations
+        if date in repo_creations:
+            # Special marker for repo creation dates
+            repos = repo_creations[date]
+            repo_names = ', '.join(repos[:3])  # Show first 3 repo names
+            if len(repos) > 3:
+                repo_names += f' +{len(repos)-3} more'
+            
+            svg += f'''    <!-- Repo creation marker at {date} -->
+    <circle cx="{x}" cy="{y}" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>{date}: Created {repo_names}</title>
+'''
+        else:
+            # Regular point (only show every Nth point to avoid clutter)
+            if i % max(1, len(dates) // 20) == 0 or i == len(dates) - 1:
+                svg += f'''    <circle cx="{x}" cy="{y}" r="3" fill="#4CAF50"/>
+'''
+    
+    svg += '''  </g>
+  
+  <!-- Legend -->
+  <g>
+    <circle cx="''' + str(width - 200) + '''" cy="''' + str(height - 40) + '''" r="3" fill="#4CAF50"/>
+    <text x="''' + str(width - 190) + '''" y="''' + str(height - 36) + '''" font-size="12" fill="#666">Star count</text>
+    
+    <circle cx="''' + str(width - 200) + '''" cy="''' + str(height - 20) + '''" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <text x="''' + str(width - 190) + '''" y="''' + str(height - 16) + '''" font-size="12" fill="#666">Repo created</text>
+  </g>
+  
+  <!-- Stats -->
+  <text x="20" y="''' + str(height - 40) + '''" font-size="11" fill="#666">Total: ''' + str(max_stars) + ''' ⭐</text>
+  <text x="20" y="''' + str(height - 25) + '''" font-size="11" fill="#666">Repos created: ''' + str(len(repo_creations)) + '''</text>
+  <text x="20" y="''' + str(height - 10) + '''" font-size="11" fill="#999">Generated: ''' + datetime.now().strftime('%Y-%m-%d') + '''</text>
+</svg>'''
+    
     return svg
+
+
 
 
 def fetch_github_data(username: str) -> Dict:
@@ -317,9 +441,20 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     
     # Fetch star history from GitHub API (only if not mock mode)
     star_history = []
+    repo_creations = {}
     if not use_mock and total_stars > 0:
         print(f"\nFetching star history from GitHub API...")
-        star_history = aggregate_star_history(username, own_repos)
+        star_history, repo_creations = aggregate_star_history(username, own_repos)
+    
+    # Generate SVG chart if we have history data
+    star_chart_svg = ""
+    if star_history and len(star_history) >= 2:
+        star_chart_svg = generate_star_trend_svg(star_history, repo_creations, username)
+        # Save SVG to file
+        svg_filename = 'star-history.svg'
+        with open(svg_filename, 'w', encoding='utf-8') as f:
+            f.write(star_chart_svg)
+        print(f"Star trend chart saved to {svg_filename}")
     
     # Get user info
     name = user_data.get('name', username)
@@ -474,18 +609,23 @@ def generate_readme(username: str, use_mock: bool = False) -> str:
     
     # Add star history chart if data available
     if star_history and len(star_history) >= 2:
-        # Create a simple text-based display of star growth
+        # Display the SVG chart
         first_star = star_history[0]
         last_star = star_history[-1]
         days_span = len(star_history)
+        num_repos_created = len(repo_creations)
         
         readme += f"""### ⭐ Total Stars Growth Trend / 总星标增长趋势
 
-**Star History Summary / 星标历史摘要:**
-- 📅 First Star: {first_star['date']} ({first_star['stars']} stars)
-- 📅 Latest: {last_star['date']} ({last_star['stars']} stars) 
-- 📈 Growth: +{last_star['stars'] - first_star['stars']} stars over {days_span} days
+![Star History Chart](star-history.svg)
+
+**Summary / 摘要:**
+- 📅 From {first_star['date']} to {last_star['date']} ({days_span} days)
+- 📈 Growth: {first_star['stars']} → {last_star['stars']} stars (+{last_star['stars'] - first_star['stars']})
 - 💫 Average: ~{(last_star['stars'] - first_star['stars']) / days_span:.2f} stars/day
+- 🎯 Repositories created during this period: {num_repos_created}
+
+*Chart shows cumulative stars over time. 🔴 Red dots mark repository creation dates.*
 
 """
     
