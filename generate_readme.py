@@ -216,7 +216,8 @@ def generate_star_trend_svg(history: List[Dict], repo_creations: Dict[str, List[
     label_padding = 4
     max_label_width = 220
     min_label_width = 80
-    label_position_offsets = (0, 1, 2, 3, -1, -2, -3)
+    # Increased offsets to spread labels further apart and avoid overlaps
+    label_position_offsets = (0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8)
 
     def boxes_overlap(box_a, box_b):
         """Return True when label boxes (x_min, x_max, y_min, y_max) overlap."""
@@ -248,10 +249,13 @@ def generate_star_trend_svg(history: List[Dict], repo_creations: Dict[str, List[
             max_top = padding_top + chart_height - label_height - label_padding
             base_top = max(min_top, min(base_top, max_top))
             
-            step = label_line_height + label_padding
+            # Increased step size to spread labels further apart
+            step = label_height + label_padding * 2
             candidate_offsets = label_position_offsets
             label_top = base_top
             label_box = (x_min, x_max, base_top - label_padding, base_top + label_height + label_padding)
+            
+            # Find the best non-overlapping position
             for offset in candidate_offsets:
                 candidate_top = base_top + (offset * step)
                 candidate_top = max(min_top, min(candidate_top, max_top))
