@@ -1,0 +1,140 @@
+<svg width="900" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="900" height="400" fill="#ffffff"/>
+  
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#333">
+    ⭐ Total Stars Growth Trend / 总星标增长趋势
+  </text>
+  
+  <!-- Y-axis labels -->
+  <text x="50" y="60" text-anchor="end" font-size="12" fill="#666">41</text>
+  <text x="50" y="320" text-anchor="end" font-size="12" fill="#666">0</text>
+  <text x="50" y="190" text-anchor="end" font-size="12" fill="#666">20</text>
+  
+  <!-- Grid lines -->
+  <line x1="60" y1="60" x2="860" y2="60" stroke="#e0e0e0" stroke-width="1"/>
+  <line x1="60" y1="190" x2="860" y2="190" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="60" y1="320" x2="860" y2="320" stroke="#666" stroke-width="2"/>
+  
+  <!-- Axes -->
+  <line x1="60" y1="60" x2="60" y2="320" stroke="#666" stroke-width="2"/>
+  
+  <!-- X-axis labels -->
+  <text x="60" y="340" text-anchor="start" font-size="11" fill="#999">2020-06-24</text>
+  <text x="860" y="340" text-anchor="end" font-size="11" fill="#999">2026-02-07</text>
+  
+  <!-- Star trend line -->
+  <path d="M 60.0,320.0 L 78.6046511627907,313.6585365853659 L 97.2093023255814,313.6585365853659 L 115.81395348837209,307.3170731707317 L 134.4186046511628,307.3170731707317 L 153.02325581395348,307.3170731707317 L 171.62790697674419,300.9756097560976 L 190.2325581395349,294.6341463414634 L 208.8372093023256,288.2926829268293 L 227.4418604651163,281.9512195121951 L 246.04651162790697,275.609756097561 L 264.6511627906977,262.9268292682927 L 283.25581395348837,250.2439024390244 L 301.86046511627904,243.90243902439025 L 320.4651162790698,237.5609756097561 L 339.06976744186045,237.5609756097561 L 357.6744186046512,231.21951219512195 L 376.27906976744185,224.8780487804878 L 394.8837209302326,218.53658536585365 L 413.48837209302326,212.1951219512195 L 432.09302325581393,205.85365853658539 L 450.6976744186046,199.5121951219512 L 469.3023255813954,193.1707317073171 L 487.906976744186,186.8292682926829 L 506.51162790697674,180.48780487804876 L 525.1162790697674,167.8048780487805 L 543.7209302325581,161.46341463414635 L 562.3255813953488,148.78048780487805 L 580.9302325581396,142.4390243902439 L 599.5348837209302,136.09756097560975 L 618.1395348837209,129.7560975609756 L 636.7441860465116,129.7560975609756 L 655.3488372093024,123.41463414634146 L 673.953488372093,123.41463414634146 L 692.5581395348837,117.07317073170731 L 711.1627906976744,104.39024390243904 L 729.7674418604652,98.04878048780489 L 748.3720930232558,91.70731707317074 L 766.9767441860465,91.70731707317074 L 785.5813953488372,85.36585365853657 L 804.1860465116279,79.02439024390242 L 822.7906976744187,72.6829268292683 L 841.3953488372092,66.34146341463415 L 860.0,60.0" stroke="#4CAF50" stroke-width="3" fill="none"/>
+  
+  <!-- Regular data points -->
+  <g>
+    <!-- Repo creation marker at 2020-06-24 -->
+    <circle cx="60.0" cy="320.0" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2020-06-24: Created tobyLaiblocks</title>
+    <text x="72.0" y="304" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 tobyLaiblocks</text>
+    <text x="72.0" y="316" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2020-06-24</text>
+    <!-- Repo creation marker at 2020-08-25 -->
+    <circle cx="97.2093023255814" cy="313.6585365853659" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2020-08-25: Created TobyPyOnline</title>
+    <text x="109.2093023255814" y="240" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 TobyPyOnline</text>
+    <text x="109.2093023255814" y="252" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2020-08-25</text>
+    <!-- Repo creation marker at 2024-01-25 -->
+    <circle cx="134.4186046511628" cy="307.3170731707317" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2024-01-25: Created hexo-theme-mdsuper</title>
+    <text x="146.4186046511628" y="176" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 hexo-theme-mdsuper</text>
+    <text x="146.4186046511628" y="188" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2024-01-25</text>
+    <!-- Repo creation marker at 2024-02-01 -->
+    <circle cx="153.02325581395348" cy="307.3170731707317" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2024-02-01: Created tobylai-fun-hexo-blog-gitalk-test</title>
+    <text x="165.02325581395348" y="304" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 tobylai-fun-hexo-blog-gitalk-test</text>
+    <text x="165.02325581395348" y="316" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2024-02-01</text>
+    <circle cx="171.62790697674419" cy="300.9756097560976" r="3" fill="#4CAF50"/>
+    <circle cx="208.8372093023256" cy="288.2926829268293" r="3" fill="#4CAF50"/>
+    <circle cx="246.04651162790697" cy="275.609756097561" r="3" fill="#4CAF50"/>
+    <!-- Repo creation marker at 2024-06-01 -->
+    <circle cx="264.6511627906977" cy="262.9268292682927" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2024-06-01: Created daopy-runtime</title>
+    <text x="276.6511627906977" y="262.9268292682927" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 daopy-runtime</text>
+    <text x="276.6511627906977" y="274.9268292682927" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2024-06-01</text>
+    <circle cx="283.25581395348837" cy="250.2439024390244" r="3" fill="#4CAF50"/>
+    <circle cx="320.4651162790698" cy="237.5609756097561" r="3" fill="#4CAF50"/>
+    <!-- Repo creation marker at 2024-08-07 -->
+    <circle cx="339.06976744186045" cy="237.5609756097561" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2024-08-07: Created ap-more</title>
+    <text x="351.06976744186045" y="205.5609756097561" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 ap-more</text>
+    <text x="351.06976744186045" y="217.5609756097561" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2024-08-07</text>
+    <circle cx="357.6744186046512" cy="231.21951219512195" r="3" fill="#4CAF50"/>
+    <!-- Repo creation marker at 2024-08-15 -->
+    <circle cx="376.27906976744185" cy="224.8780487804878" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2024-08-15: Created ArenaLess-Template, box3-arenaless-example-on-web</title>
+    <text x="388.27906976744185" y="262.8780487804878" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 ArenaLess-Template</text>
+    <text x="388.27906976744185" y="274.8780487804878" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 box3-arenaless-example-on-web</text>
+    <text x="388.27906976744185" y="286.8780487804878" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2024-08-15</text>
+    <circle cx="394.8837209302326" cy="218.53658536585365" r="3" fill="#4CAF50"/>
+    <circle cx="432.09302325581393" cy="205.85365853658539" r="3" fill="#4CAF50"/>
+    <circle cx="469.3023255813954" cy="193.1707317073171" r="3" fill="#4CAF50"/>
+    <circle cx="506.51162790697674" cy="180.48780487804876" r="3" fill="#4CAF50"/>
+    <!-- Repo creation marker at 2025-01-11 -->
+    <circle cx="525.1162790697674" cy="167.8048780487805" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2025-01-11: Created OnlineObj2Voxel</title>
+    <text x="537.1162790697674" y="167.8048780487805" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 OnlineObj2Voxel</text>
+    <text x="537.1162790697674" y="179.8048780487805" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2025-01-11</text>
+    <circle cx="543.7209302325581" cy="161.46341463414635" r="3" fill="#4CAF50"/>
+    <!-- Repo creation marker at 2025-02-11 -->
+    <circle cx="562.3255813953488" cy="148.78048780487805" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2025-02-11: Created QMCLI</title>
+    <text x="574.3255813953488" y="116.78048780487805" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 QMCLI</text>
+    <text x="574.3255813953488" y="128.78048780487805" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2025-02-11</text>
+    <circle cx="580.9302325581396" cy="142.4390243902439" r="3" fill="#4CAF50"/>
+    <circle cx="618.1395348837209" cy="129.7560975609756" r="3" fill="#4CAF50"/>
+    <!-- Repo creation marker at 2025-04-19 -->
+    <circle cx="636.7441860465116" cy="129.7560975609756" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2025-04-19: Created voxbuilder-mcp-local</title>
+    <text x="648.7441860465116" y="161.7560975609756" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 voxbuilder-mcp-local</text>
+    <text x="648.7441860465116" y="173.7560975609756" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2025-04-19</text>
+    <circle cx="655.3488372093024" cy="123.41463414634146" r="3" fill="#4CAF50"/>
+    <!-- Repo creation marker at 2025-05-25 -->
+    <circle cx="673.953488372093" cy="123.41463414634146" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2025-05-25: Created tobylaifun</title>
+    <text x="685.953488372093" y="123.41463414634146" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 tobylaifun</text>
+    <text x="685.953488372093" y="135.41463414634146" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2025-05-25</text>
+    <!-- Repo creation marker at 2025-06-21 -->
+    <circle cx="692.5581395348837" cy="117.07317073170731" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2025-06-21: Created dao3charts</title>
+    <text x="704.5581395348837" y="85.07317073170731" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 dao3charts</text>
+    <text x="704.5581395348837" y="97.07317073170731" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2025-06-21</text>
+    <!-- Repo creation marker at 2025-07-04 -->
+    <circle cx="711.1627906976744" cy="104.39024390243904" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2025-07-04: Created dao3up</title>
+    <text x="723.1627906976744" y="200.39024390243904" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 dao3up</text>
+    <text x="723.1627906976744" y="212.39024390243904" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2025-07-04</text>
+    <!-- Repo creation marker at 2025-08-08 -->
+    <circle cx="729.7674418604652" cy="98.04878048780489" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2025-08-08: Created cyberai20x5-logicrebel</title>
+    <text x="717.7674418604652" y="226.0487804878049" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="end">📦 cyberai20x5-logicrebel</text>
+    <text x="717.7674418604652" y="238.0487804878049" font-size="9" fill="#999" font-weight="normal" text-anchor="end">2025-08-08</text>
+    <!-- Repo creation marker at 2025-08-28 -->
+    <circle cx="766.9767441860465" cy="91.70731707317074" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <title>2025-08-28: Created dao3up.nvim</title>
+    <text x="778.9767441860465" y="123.70731707317074" font-size="10" fill="#FF5722" font-weight="bold" text-anchor="start">📦 dao3up.nvim</text>
+    <text x="778.9767441860465" y="135.70731707317074" font-size="9" fill="#999" font-weight="normal" text-anchor="start">2025-08-28</text>
+    <circle cx="804.1860465116279" cy="79.02439024390242" r="3" fill="#4CAF50"/>
+    <circle cx="841.3953488372092" cy="66.34146341463415" r="3" fill="#4CAF50"/>
+    <circle cx="860.0" cy="60.0" r="3" fill="#4CAF50"/>
+  </g>
+  
+  <!-- Legend -->
+  <g>
+    <circle cx="700" cy="360" r="3" fill="#4CAF50"/>
+    <text x="710" y="364" font-size="12" fill="#666">Star count</text>
+    
+    <circle cx="700" cy="380" r="8" fill="#FF5722" stroke="#fff" stroke-width="2"/>
+    <text x="710" y="384" font-size="12" fill="#666">Repo created</text>
+  </g>
+  
+  <!-- Stats -->
+  <text x="20" y="360" font-size="11" fill="#666">Total: 41 ⭐</text>
+  <text x="20" y="375" font-size="11" fill="#666">Repos created: 16</text>
+  <text x="20" y="390" font-size="11" fill="#999">Generated: 2026-02-11</text>
+</svg>
