@@ -4,6 +4,7 @@
 <a href="https://tobylai.fun">
     <img src="https://img.shields.io/badge/blog-tobylai.fun-orange?logo=google-chrome" alt="Blog" />
 </a>
+
 ![](https://komarev.com/ghpvc/?username=tobylaifun&color=brightgreen&style=flat-square&label=Profile+Views)
 
 ---
